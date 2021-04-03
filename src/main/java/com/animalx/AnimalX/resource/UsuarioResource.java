@@ -1,6 +1,7 @@
 package com.animalx.AnimalX.resource;
 
 
+import java.io.File;
 import java.security.NoSuchAlgorithmException;
 import java.time.Instant;
 import java.util.List;
@@ -94,7 +95,7 @@ public class UsuarioResource {
 		}
 	}
 	@DeleteMapping("/excluirPerfil")
-	public ResponseEntity<?>  deleteContato ( @RequestBody UsuarioStartDTO dto) {
+	public ResponseEntity<?>  deleteUsuario ( @RequestBody UsuarioStartDTO dto) {
 		 
 		  if(dto == null){
 				return ResponseEntity.badRequest().body("Não foi possivel atualizar o usúario");
@@ -155,10 +156,12 @@ public class UsuarioResource {
 	 
 	@PostMapping("/uploadFotoPerfil/{id_usuario}")
 	public ResponseEntity<?> uploadFotoPerfilUsuario(@PathVariable("id_usuario") Long id_usuario,@RequestParam MultipartFile file){
-		FotoUploadDisco uploadDisco = new FotoUploadDisco();
+		 FotoUploadDisco uploadDisco = new FotoUploadDisco();
 		 Usuario userUpload = new Usuario();
 		 userUpload.setId(id_usuario);
-		 userUpload.setImg_login("C:\\uploadAnimalX\\perfil\\"+file.getOriginalFilename());
+		  //RENOMEAR IMAGEM 
+		  
+		 userUpload.setImg_login(file.getOriginalFilename());
 	 	 uploadDisco.salvarFoto(file);
 	 	 service.uploadFotoPerfil(userUpload);
 		try {

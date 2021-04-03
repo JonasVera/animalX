@@ -15,7 +15,7 @@ import lombok.ToString;
 @AllArgsConstructor
 public class AnimalDTO {
 
-	private String id;
+	private Long id;
 	private String apelido;
 	private String especie;
 	private String raca;
@@ -27,7 +27,8 @@ public class AnimalDTO {
 	private String situacao;
 	private String logintude;
 	private String latitude;
-	private String usuario;
+	private Long usuario;
 	private String sexo;
+ 
 
 }

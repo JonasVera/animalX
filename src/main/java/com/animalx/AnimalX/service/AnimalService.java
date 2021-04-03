@@ -26,15 +26,14 @@ public class AnimalService {
 	private UsuarioService userService;
 	
 	@Transactional 
-	public Animal cadastrarEmpresa(Animal animal, Usuario usuario) {
+	public Animal cadastrarAnimalComUsuario(Animal animal) {
 		
-		Optional<Usuario> user = userService.obterPorId(usuario.getId());
+		Optional<Usuario> user = userService.obterPorId(animal.getUsuario().getId());
 
 		if (user.isPresent()) {
-			animal.setUsuario(usuario);
-				return repository.save(animal);
+			 return repository.save(animal);
 		} else {
-			throw new RegraNegocioException("Não foi possivel cadastrar empresa, usuario não encontrado.");
+			throw new RegraNegocioException("Não foi possivel cadastrar o animal, usuario não encontrado.");
 		}
 
 	}
@@ -58,7 +57,7 @@ public class AnimalService {
 		 } 
 	}
  
-	public void alterarEmpresa(Animal animal) {
+	public void alterarAnimal(Animal animal) {
 		repository.save(animal);
 	}
 	@Transactional 
@@ -71,7 +70,7 @@ public class AnimalService {
 	}
 	
 	public void excluirAnimal(Animal animal) {
-	  repository.delete(animal);
+		repository.delete(animal);
 	}
 	
 	public void validaAnimal(Animal animal) {

@@ -10,10 +10,10 @@ import org.springframework.web.multipart.MultipartFile;
 public class FotoUploadDisco {
 
 	 
-	private String raiz = "C:\\testeupload";
+	private String raiz = "C:\\uploadAnimalX";
 	 
 	 
-	private String diretorioFotos = "\\fotos";
+	private String diretorioFotos = "\\perfil";
 	
 	public void salvarFoto(MultipartFile foto) {
 		this.salvar(this.diretorioFotos, foto);

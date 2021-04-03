@@ -29,7 +29,7 @@ public class FileServer {
 				Path path1 = Paths.get(path);
 				
 				Files.write(path1, bytes); 
-				 
+			
 			} catch (IOException e) { 
 				e.printStackTrace();
 			}

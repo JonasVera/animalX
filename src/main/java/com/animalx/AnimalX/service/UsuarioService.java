@@ -35,11 +35,9 @@ public class UsuarioService {
 	  
 	}
 	public void uploadFotoPerfil(Usuario user){
-	 	Usuario userUp = new Usuario();
-
+	 	Usuario userUp = new Usuario(); 
 		userUp = obterPorId(user.getId()).get();
-		userUp.setImg_login(user.getImg_login());
-
+		userUp.setImg_login(user.getImg_login()); 
 		repository.save(userUp);
 	}
 	public Usuario updateUsuario(Usuario usuario) {

@@ -6,6 +6,7 @@ import java.util.List;
 import java.util.Optional;
 
 import com.animalx.AnimalX.dto.AnimalDTO;
+import com.animalx.AnimalX.dto.UsuarioStartDTO;
 import com.animalx.AnimalX.entity.Animal;
 import com.animalx.AnimalX.entity.Usuario;
 import com.animalx.AnimalX.exeptions.RegraNegocioException;
@@ -14,6 +15,7 @@ import com.animalx.AnimalX.service.UsuarioService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -33,10 +35,10 @@ public class AnimalResource {
 	private UsuarioService userService;
 	 
 	@PostMapping
-	public ResponseEntity<?> adicionarAnimal ( @RequestBody AnimalDTO dto) {
+	public ResponseEntity<?> adicionarAnimalComUsuario ( @RequestBody AnimalDTO dto) {
 		
 		Usuario usuario = new Usuario();
-		usuario.setId(Long.parseLong(dto.getUsuario()));
+		usuario.setId(dto.getUsuario());
 		
 		Animal animal = Animal.builder()
 				.apelido(dto.getApelido())
@@ -53,9 +55,10 @@ public class AnimalResource {
 				.data_atualizacao(LocalDate.now())
 				.data_cadastro(LocalDate.now())
 				.sexo(dto.getSexo())
+				.usuario(usuario)
 				.build();
 		try {
-			Animal animalSalva = service.cadastrarEmpresa(animal,usuario);
+			Animal animalSalva = service.cadastrarAnimalComUsuario(animal);
 			return new ResponseEntity<Animal>(animalSalva, HttpStatus.CREATED);
 		}catch (RegraNegocioException e) {
 			return ResponseEntity.badRequest().body(e.getMessage());
@@ -64,11 +67,14 @@ public class AnimalResource {
 	
 	@PutMapping
 	public ResponseEntity<?> alterarAnimal ( @RequestBody AnimalDTO dto) {
+		Usuario usuario = new Usuario();
+		usuario.setId(dto.getUsuario());
 		 if(dto == null) 
-				return ResponseEntity.badRequest().body("Não foi possivel atualizar a empresa");
+				return ResponseEntity.badRequest().body("Não foi possivel atualizar o pet informado !");
 		else
-			 
-		return service.obterPorId(Long.parseLong(dto.getId())).map(
+			
+		return service.obterPorId(dto.getId()).map(
+				
 				  entity ->{
 					try {
 
@@ -86,11 +92,12 @@ public class AnimalResource {
 								.latitude(dto.getLatitude())
 								.data_atualizacao(LocalDate.now())
 								.data_cadastro(LocalDate.now())
+								.usuario(usuario)
 								.build();
 						  
 						  entity = animal;
 						  
-						  service.alterarEmpresa(animal);
+						  service.alterarAnimal(animal);
 						  
 						  return ResponseEntity.ok(entity);
 					} catch (RegraNegocioException e ) {
@@ -132,6 +139,34 @@ public class AnimalResource {
 		
 	}
 
+	@DeleteMapping("/excluirPerfil")
+	public ResponseEntity<?>  deleteAnimal ( @RequestBody AnimalDTO dto) {
+		 
+		  if(dto == null){
+				return ResponseEntity.badRequest().body("Não foi possivel atualizar o usúario");
+			}
+			else{
+				return service.obterPorId(dto.getId()).map(
+						  entity ->{
+							try { 
+								  Animal animal = Animal.builder()
+											.id(dto.getId())
+											.build();  
+											 
+								  entity = animal;
+								  
+								  service.excluirAnimal(animal);
+								  
+								  return new ResponseEntity<>(HttpStatus.OK);
+							} catch (RegraNegocioException e) {
+								return ResponseEntity.badRequest().body(e.getMessage());
+							} 
+					 
+						}).orElseGet(() 
+						-> new ResponseEntity<String>("Usuario não encontrado.",HttpStatus.BAD_REQUEST));
+			}  		 
+	}
+	
 	@GetMapping("/buscar/{id_usuario}/{id_animal}")
 	public ResponseEntity<?> buscar( @PathVariable( "id_usuario") Long idUsuario, @PathVariable( "id_animal") Long idAnimal) {
 
