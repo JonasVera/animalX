@@ -1,7 +1,7 @@
 package com.animalx.AnimalX.entity;
 
 import java.time.Instant;
-import java.util.Date;
+ 
 
 import javax.persistence.*;
 
@@ -12,7 +12,7 @@ import lombok.EqualsAndHashCode;
 import lombok.NoArgsConstructor;
  
 import lombok.ToString;
-import org.springframework.data.jpa.convert.threeten.Jsr310JpaConverters;
+//import org.springframework.data.jpa.convert.threeten.Jsr310JpaConverters;
 
 @Entity
 @Table(name = "usuario", schema = "api_animalx")

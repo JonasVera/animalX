@@ -4,11 +4,14 @@ import java.math.BigDecimal;
 import java.time.LocalDate;
 import java.util.List;
 import java.util.Optional; 
-import com.animalx.AnimalX.dto.AnimalDTO; 
+import com.animalx.AnimalX.dto.AnimalDTO;
+import com.animalx.AnimalX.dto.ContatoDTO;
 import com.animalx.AnimalX.entity.Animal;
+import com.animalx.AnimalX.entity.Contato;
 import com.animalx.AnimalX.entity.Usuario;
 import com.animalx.AnimalX.exeptions.RegraNegocioException;
 import com.animalx.AnimalX.service.AnimalService;
+import com.animalx.AnimalX.service.ContatoService;
 import com.animalx.AnimalX.service.UsuarioService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
@@ -25,19 +28,20 @@ import org.springframework.web.bind.annotation.RestController;
 
 @RestController
 @RequestMapping("api/animal")
-public class AnimalResource {
+public class AnimalComContatoResource {
 
 	@Autowired
 	private AnimalService service;
+	
+	@Autowired
+	private ContatoService Contatoservice;
+	
 	@Autowired
 	private UsuarioService userService;
 	 
-	@PostMapping
-	public ResponseEntity<?> adicionarAnimalComUsuario ( @RequestBody AnimalDTO dto) {
-		
-		Usuario usuario = new Usuario();
-		usuario.setId(dto.getUsuario());
-		
+	@PostMapping("/salvarAnimalComContato")
+	public ResponseEntity<?> adicionarAnimalSemUsuario (@RequestBody AnimalDTO dto,@RequestBody ContatoDTO contatoDto) {
+		 
 		Animal animal = Animal.builder()
 				.apelido(dto.getApelido())
 				.categoria(dto.getCategoria())
@@ -53,10 +57,23 @@ public class AnimalResource {
 				.data_atualizacao(LocalDate.now())
 				.data_cadastro(LocalDate.now())
 				.sexo(dto.getSexo())
-				.usuario(usuario)
 				.build();
-		try {
+		
+		Contato contato = Contato.builder()
+				.email(contatoDto.getEmail())
+				.tefone(contatoDto.getTefone())
+				.cidade(contatoDto.getCidade())
+				.estado(contatoDto.getEstado())
+				.data_atualizacao(LocalDate.now())
+				.data_cadastro(LocalDate.now())
+				.animal(animal)
+				.build();
+			
+			try {
+			
 			Animal animalSalva = service.cadastrarAnimalComUsuario(animal);
+			Contato contatoSalvo = Contatoservice.cadastrarContatoComUsuario(contato);
+			
 			return new ResponseEntity<Animal>(animalSalva, HttpStatus.CREATED);
 		}catch (RegraNegocioException e) {
 			return ResponseEntity.badRequest().body(e.getMessage());

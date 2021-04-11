@@ -128,10 +128,8 @@ public class UsuarioService {
 		
 		if (existe)
 			throw new RegraNegocioException("Já existe um usuário cadastrado com este email.");
-		return existe;
-				
-	}
-	
+		return existe; 
+	} 
 	public Usuario findByEmail(String email) {
  
 		return repository.findByEmail(email);

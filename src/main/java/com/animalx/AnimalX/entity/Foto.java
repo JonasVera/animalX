@@ -2,7 +2,7 @@ package com.animalx.AnimalX.entity;
  
 import javax.persistence.*;
 
-import lombok.Builder;
+ 
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 import lombok.NoArgsConstructor;
@@ -11,6 +11,7 @@ import lombok.NoArgsConstructor;
 @EqualsAndHashCode
 @NoArgsConstructor
 @Entity
+
 @Table(name = "fotos", schema = "api_animalx")
 public class Foto {
 	

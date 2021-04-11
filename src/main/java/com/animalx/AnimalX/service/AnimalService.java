@@ -53,7 +53,7 @@ public class AnimalService {
 		 if	(animal.getUsuario().getId() != null) {
 			 return repository.findById(animal.getId());
 		 }else {
-			 throw new RegraNegocioException("Empresa não encontrada para este usúario.");
+			 throw new RegraNegocioException("Animal não encontrado para este usúario.");
 		 } 
 	}
  
@@ -64,6 +64,7 @@ public class AnimalService {
 	public void listarAnimais() {
 		repository.findAll();
 	}
+	
 	@Transactional 
 	public Optional<Animal> obterPorId(Long id) {
 		return repository.findById(id);
@@ -76,7 +77,7 @@ public class AnimalService {
 	public void validaAnimal(Animal animal) {
 		 
 		if (repository.findById(animal.getId()).isPresent() == false) {
-			throw new RegraNegocioException("Empresa não existe !");
+			throw new RegraNegocioException("Animal já não existe !");
 		}
 	}
 }

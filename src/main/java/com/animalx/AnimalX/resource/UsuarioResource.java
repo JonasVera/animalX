@@ -1,7 +1,5 @@
 package com.animalx.AnimalX.resource;
-
-
-import java.io.File;
+ 
 import java.security.NoSuchAlgorithmException;
 import java.time.Instant;
 import java.util.List;
@@ -159,11 +157,14 @@ public class UsuarioResource {
 		 FotoUploadDisco uploadDisco = new FotoUploadDisco();
 		 Usuario userUpload = new Usuario();
 		 userUpload.setId(id_usuario);
-		  //RENOMEAR IMAGEM 
-		  
-		 userUpload.setImg_login(file.getOriginalFilename());
-	 	 uploadDisco.salvarFoto(file);
-	 	 service.uploadFotoPerfil(userUpload);
+		  //RENOMEAR IMAGEM  
+	 	 if(service.obterPorId(userUpload.getId()).isPresent()) {
+	 		 userUpload.setImg_login(file.getOriginalFilename());
+		 	 uploadDisco.salvarFoto(file);
+		 	 service.uploadFotoPerfil(userUpload);
+	 	 }else
+	 		return  new ResponseEntity<String>("Usuario não encontrado.",HttpStatus.BAD_REQUEST);
+	 	
 		try {
 			return new ResponseEntity<Usuario>(userUpload, HttpStatus.CREATED);
 		}catch (RegraNegocioException e) {
