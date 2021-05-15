@@ -1,8 +1,11 @@
 package com.animalx.AnimalX.entity;
  
+import java.time.Instant;
+
 import javax.persistence.*;
 
- 
+import com.fasterxml.jackson.annotation.JsonIgnore;
+
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 import lombok.NoArgsConstructor;
@@ -10,9 +13,8 @@ import lombok.NoArgsConstructor;
 @Data
 @EqualsAndHashCode
 @NoArgsConstructor
-@Entity
-
-@Table(name = "fotos", schema = "api_animalx")
+@Entity 
+@Table(name = "foto", schema = "api_animalx")
 public class Foto {
 	
 	@Id
@@ -21,15 +23,21 @@ public class Foto {
 	private Long id;
 	@Column(name = "nome")
 	private String nome;
-	@Column(name = "caminho")
-	private String caminho;
+	 
 	@Column(name = "tamanho")
-	private String tamanho;
+	private Long tamanho;
 	 
 	@Column(name = "contexto")
 	private String contexto;
 
 	@ManyToOne
-	@JoinColumn(name = "animal_id")
+	@JoinColumn(name = "id_animal")
+	@JsonIgnore
 	private Animal animal;
+	
+	@Column(name = "data_cadastro")
+	private Instant data_cadastro;
+ 
+	@Column(name = "data_atualizacao")
+	private Instant data_atualizacao;
 }

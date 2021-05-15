@@ -1,10 +1,9 @@
 package com.animalx.AnimalX.entity;
 
 import java.math.BigDecimal;
-import java.time.LocalDate;
+import java.time.Instant;
 import java.util.List;
 import javax.persistence.Column;
-import javax.persistence.Convert;
 import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
@@ -13,7 +12,6 @@ import javax.persistence.JoinColumn;
 import javax.persistence.ManyToOne;
 import javax.persistence.OneToMany;
 import javax.persistence.Table;
-import org.springframework.data.jpa.convert.threeten.Jsr310JpaConverters;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -49,6 +47,9 @@ public class Animal {
 
 	@Column(name = "peso")
 	private BigDecimal peso;
+	
+	@Column(name = "altura")
+	private BigDecimal alura;
 
 	@Column(name = "categoria")
 	private String categoria;
@@ -65,25 +66,24 @@ public class Animal {
 	@Column(name = "sexo")
 	private String sexo;
 
-	@Column(name = "longitude")
-	private String longitude;
-
-	@Column(name = "latitude")
-	private String latitude;
-
+	@Column(name = "estado")
+	private String estado;
+	
+	@Column(name = "cidade")
+	private String cidade;
+ 
 	@ManyToOne
 	@JoinColumn(name = "id_usuario")
+	@JsonIgnore
 	private Usuario usuario;
 
-	@Convert(converter = Jsr310JpaConverters.LocalDateConverter.class)
+	 
 	@Column(name = "data_cadastro")
-	private LocalDate data_cadastro;
-	
-	@Convert(converter = Jsr310JpaConverters.LocalDateConverter.class)
+	private Instant data_cadastro; 
+ 
 	@Column(name = "data_atualizacao")
-	private  LocalDate data_atualizacao;
+	private  Instant data_atualizacao;
 	
-    @OneToMany(mappedBy = "animal")
-    @JsonIgnore
+    @OneToMany(mappedBy = "animal") 
 	private List<Foto> fotos;
 }

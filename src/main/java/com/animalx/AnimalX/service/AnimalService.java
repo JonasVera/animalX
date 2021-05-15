@@ -2,17 +2,15 @@ package com.animalx.AnimalX.service;
 
 import java.util.List;
 import java.util.Optional;
-
 import javax.transaction.Transactional;
-
 import com.animalx.AnimalX.entity.Animal;
 import com.animalx.AnimalX.entity.Usuario;
 import com.animalx.AnimalX.exeptions.RegraNegocioException;
 import com.animalx.AnimalX.repository.AnimalRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Example;
-import org.springframework.data.domain.ExampleMatcher;
-import org.springframework.data.domain.ExampleMatcher.StringMatcher;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
 
@@ -40,10 +38,9 @@ public class AnimalService {
 	 
 	@Transactional 
 	public List<Animal> buscar(Animal animalFiltro) {
-		Example<Animal> example = Example.of(animalFiltro, ExampleMatcher.matching()
-				.withIgnoreCase()
-				.withStringMatcher(StringMatcher.CONTAINING));
-		 
+		Example<Animal> example = Example.of(animalFiltro);
+		 if (example == null)
+			 return repository.findAll();
 		return repository.findAll(example);
 	}
 	
@@ -60,17 +57,38 @@ public class AnimalService {
 	public void alterarAnimal(Animal animal) {
 		repository.save(animal);
 	}
-	@Transactional 
-	public void listarAnimais() {
-		repository.findAll();
-	}
 	
+	
+	public void adotar(Long id) {
+		Animal animal = repository.findById(id).get();
+		if (animal.getId() != null) {
+			animal.setSituacao("ADOTADO");
+			repository.save(animal);
+		} 	
+	} 
 	@Transactional 
 	public Optional<Animal> obterPorId(Long id) {
 		return repository.findById(id);
 	}
+	@Transactional 
+	public Page<Animal> listAnimais (Pageable paginacao){
+		return repository.findByAnimalNaoAdotado(paginacao);
+		
+	}
 	
+	@Transactional 
+	public Page<Animal> listAnimaisAdotado (Pageable paginacao){
+		return repository.findByAnimalAdotado(paginacao);
+		
+	}
+	
+	@Transactional 
+	public Page<Animal> listAnimaisTodos(Pageable paginacao){
+		return repository.findAll(paginacao); 
+	}
+  
 	public void excluirAnimal(Animal animal) {
+		validaAnimal(animal);
 		repository.delete(animal);
 	}
 	

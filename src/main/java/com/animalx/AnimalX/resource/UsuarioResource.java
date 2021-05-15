@@ -2,27 +2,34 @@ package com.animalx.AnimalX.resource;
  
 import java.security.NoSuchAlgorithmException;
 import java.time.Instant;
-import java.util.List;
+ 
 import javax.mail.MessagingException;
+
+import com.animalx.AnimalX.constants.ProfileEnum;
 import com.animalx.AnimalX.dto.UsuarioStartDTO;
 import com.animalx.AnimalX.entity.Usuario;
 import com.animalx.AnimalX.exeptions.RegraNegocioException;
-import com.animalx.AnimalX.service.UsuarioService;
-import com.animalx.AnimalX.utils.FotoUploadDisco;
-import org.springframework.beans.factory.annotation.Autowired;
+import com.animalx.AnimalX.service.S3StorageService;
+import com.animalx.AnimalX.service.UsuarioService; 
+import org.springframework.beans.factory.annotation.Autowired; 
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
 @RestController
 @RequestMapping("/api/usuario/")
+@CrossOrigin(origins = "*")
 public class UsuarioResource {
 
 	@Autowired
 	private UsuarioService service;
 
-	@PostMapping("/salvar")
+	 @Autowired
+	 private S3StorageService serviceS3;
+	 
+	@PostMapping("/salvar") 
 	public ResponseEntity<?> salvarUsuario ( @RequestBody UsuarioStartDTO dto) {
 
 		Usuario usuario = Usuario.builder()
@@ -30,7 +37,7 @@ public class UsuarioResource {
 				.email(dto.getEmail())
 				.senha(dto.getSenha())
 				.data_cadastro((Instant.now()))
-				.tipo_usuario("user")
+				.tipo_usuario(ProfileEnum.ROLE_CUSTUMER.toString())
 				.build();
 		try {
 			Usuario usuarioSalvo = service.salvarUsuario(usuario);
@@ -40,31 +47,23 @@ public class UsuarioResource {
 		}
 	}
 	@GetMapping("usuarios") 
+	@PreAuthorize("hasAnyRole('ADMIN')")
 	public ResponseEntity<?> listUsuarios() {
 		
 		return ResponseEntity.ok(service.listUsuarios());
 	}
-	
-	@GetMapping("/buscar")
-	public ResponseEntity<?> buscar(
-								 @RequestParam(value = "nome" ,required = false) String nome,
-			 					 @RequestParam(value = "email",required = false) String email,
-			 					 @RequestParam(value = "tipo",required = false) String tipo
-			 					 
-				) {
-		 
-		Usuario usuarioFiltro = new Usuario();
-			usuarioFiltro.setNome(nome);
-			usuarioFiltro.setNome(email);
-			usuarioFiltro.setTipo_usuario(tipo);
-		List<Usuario> usuarioEncontrados = service.buscar(usuarioFiltro);
-		return ResponseEntity.ok(usuarioEncontrados);
+	 
+	@GetMapping("relatorio") 
+	@PreAuthorize("hasAnyRole('ADMIN')")
+	public ResponseEntity<?> relatorio() {
 		
+		return ResponseEntity.ok(service.getRelatorio());
 	}
+	 
 	
 	@PostMapping("/update")
 	public ResponseEntity<?> updateUsuario( @RequestBody UsuarioStartDTO dto) {
-		if(dto == null){
+		if(dto == null || dto.getId() == null || dto.getId().toString() == ""){
 			return ResponseEntity.badRequest().body("Não foi possivel atualizar o usúario");
 		}
 		else{
@@ -76,8 +75,9 @@ public class UsuarioResource {
 										.nome(dto.getNome())
 										.email(dto.getEmail())
 										.data_cadastro(Instant.now())
+										.senha(dto.getSenha())
 										.data_atualizacao(Instant.now())
-										.tipo_usuario("user")
+										.tipo_usuario(ProfileEnum.ROLE_CUSTUMER.toString())
 										.build(); 
 							  entity = usuario;
 							  
@@ -95,7 +95,7 @@ public class UsuarioResource {
 	@DeleteMapping("/excluirPerfil")
 	public ResponseEntity<?>  deleteUsuario ( @RequestBody UsuarioStartDTO dto) {
 		 
-		  if(dto == null){
+		if(dto == null || dto.getId() == null || dto.getId().toString() == ""){
 				return ResponseEntity.badRequest().body("Não foi possivel atualizar o usúario");
 			}
 			else{
@@ -104,12 +104,9 @@ public class UsuarioResource {
 							try { 
 								  Usuario usuario = Usuario.builder()
 											.id(dto.getId())
-											.build();  
-											 
-								  entity = usuario;
-								  
-								  service.excluirPerfil(usuario);
-								  
+											.build();   
+								  entity = usuario; 
+								  service.excluirPerfil(usuario); 
 								  return new ResponseEntity<>(HttpStatus.OK);
 							} catch (RegraNegocioException e) {
 								return ResponseEntity.badRequest().body(e.getMessage());
@@ -119,30 +116,42 @@ public class UsuarioResource {
 						-> new ResponseEntity<String>("Usuario não encontrado.",HttpStatus.BAD_REQUEST));
 			}  		 
 	}
-	
+	 
 	@PostMapping("emailRecuperarSenha/{email}")
 	public ResponseEntity<?>  emailRecupersenha (@PathVariable("email") String email ) throws MessagingException {
 		Usuario user = new Usuario();
 		user.setEmail(email);
 	 
-		try {
-			service.enviarEmailRecupercaoSenha(user);
-		} catch (NoSuchAlgorithmException e) {
-		  e.printStackTrace();
+		if (user.getEmail().equals("") || user.getEmail().contains("@")== false)
+			return	new ResponseEntity<String>("E-mail invalido !",HttpStatus.BAD_REQUEST);
+		else {
+			
+			try {
+				service.enviarEmailRecupercaoSenha(user);
+			} catch (NoSuchAlgorithmException e) {
+			  e.printStackTrace();
+			} 
+			return new ResponseEntity<Usuario>(HttpStatus.CREATED);	 
 		} 
-		return new ResponseEntity<Usuario>(HttpStatus.CREATED);	 
 	}
 	
-	@PostMapping("RecuperarSenha/{id}/{email}")
+	@PostMapping("recuperarSenha/{id}/{email}")
 	public ResponseEntity<?>  atualizarSenha (@PathVariable("id") String id,@PathVariable("email") String email,@RequestBody UsuarioStartDTO dto){
 		Usuario user = new Usuario();
 		
 		user.setEmail(email);
-		user = service.findByEmail(user.getEmail());
-		String encript = service.encriptar(user.getId().toString());
 		user.setSenha(dto.getSenha());
-		if(encript.equals(id)) {
-
+		if (user.getEmail().equals("") || user.getEmail().contains("@") == false)
+			return	new ResponseEntity<String>("E-mail invalido !",HttpStatus.BAD_REQUEST);
+		
+		user = service.findByEmail(user.getEmail());
+		
+		if (user.getEmail() == null || user.getEmail().equals("@")) 
+			return	new ResponseEntity<String>("E-mail invalido !",HttpStatus.BAD_REQUEST);
+		
+		String encript = service.encriptar(user.getId().toString());
+		
+		if(encript.equals(id)) { 
 		 service.recuperarSenha(user);
 			 	
 		}else {
@@ -154,16 +163,15 @@ public class UsuarioResource {
 	 
 	@PostMapping("/uploadFotoPerfil/{id_usuario}")
 	public ResponseEntity<?> uploadFotoPerfilUsuario(@PathVariable("id_usuario") Long id_usuario,@RequestParam MultipartFile file){
-		 FotoUploadDisco uploadDisco = new FotoUploadDisco();
+	 
 		 Usuario userUpload = new Usuario();
 		 userUpload.setId(id_usuario);
-		  //RENOMEAR IMAGEM  
+		 
 	 	 if(service.obterPorId(userUpload.getId()).isPresent()) {
-	 		 userUpload.setImg_login(file.getOriginalFilename());
-		 	 uploadDisco.salvarFoto(file);
-		 	 service.uploadFotoPerfil(userUpload);
+	 		 userUpload.setImg_login(serviceS3.uploadFile(file));
+	 		  service.uploadFotoPerfil(userUpload);
 	 	 }else
-	 		return  new ResponseEntity<String>("Usuario não encontrado.",HttpStatus.BAD_REQUEST);
+	 		return  new ResponseEntity<String>("Foto não encontrada.",HttpStatus.BAD_REQUEST);
 	 	
 		try {
 			return new ResponseEntity<Usuario>(userUpload, HttpStatus.CREATED);

@@ -4,7 +4,6 @@ import java.time.Instant;
  
 
 import javax.persistence.*;
-
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
@@ -16,7 +15,6 @@ import lombok.ToString;
 
 @Entity
 @Table(name = "usuario", schema = "api_animalx")
- 
 @Data
 @Builder
 @EqualsAndHashCode
@@ -50,5 +48,5 @@ public class Usuario {
 	
 	@Column(name = "senha")
 	private String senha;
-
+	
 }
