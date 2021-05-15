@@ -1,5 +1,6 @@
 package com.animalx.AnimalX.resource; 
 import java.math.BigDecimal;
+import java.security.NoSuchAlgorithmException;
 import java.time.Instant; 
 import java.util.List;
 import java.util.Optional; 
@@ -53,9 +54,7 @@ public class AnimalResource {
 				.peso(BigDecimal.valueOf(Double.parseDouble(dto.getPeso())))
 				.alura(BigDecimal.valueOf(Double.parseDouble(dto.getAltura())))
 				.categoria(dto.getCategoria())
-				.situacao(dto.getSituacao())
-				.estado(dto.getEstado())
-				.cidade(dto.getCidade())
+				.situacao(dto.getSituacao()) 
 				.data_atualizacao(Instant.now()) 
 				.data_cadastro((Instant.now()))
 				.sexo(dto.getSexo())
@@ -91,9 +90,7 @@ public class AnimalResource {
 								.idade(Integer.parseInt(dto.getIdade()))
 								.peso(BigDecimal.valueOf(Double.parseDouble(dto.getPeso())))
 								.categoria(dto.getCategoria())
-								.situacao(dto.getSituacao())
-								.estado(dto.getEstado())
-								.cidade(dto.getCidade())
+								.situacao(dto.getSituacao())  
 								.data_atualizacao(Instant.now()) 
 								.usuario(usuario)
 								.build();
@@ -116,6 +113,21 @@ public class AnimalResource {
 		return service.listAnimais(paginacao); 
 	}
 	
+	@GetMapping("animaisUsuario/{id_usuario}") 
+	public Page<Animal> listAnimais(@PageableDefault(sort = "id", direction = Direction.ASC) Pageable paginacao,
+			@PathVariable( "id_usuario") Long idUsuario) { 
+		Usuario usuario = new Usuario();
+		
+		if (userService.obterPorId(idUsuario).isPresent()) {
+			usuario = userService.obterPorId(idUsuario).get();
+			return service.listAnimaisUsuario(paginacao,usuario); 
+		}else {
+			  return null;
+		}
+		  
+	}
+	
+	
 	@GetMapping("animais/adotados")  
 	public Page<Animal> listAnimaisAdotados(@PageableDefault(sort = "id", direction = Direction.ASC) Pageable paginacao ) { 
 		return service.listAnimaisAdotado(paginacao); 
@@ -124,10 +136,18 @@ public class AnimalResource {
 	public ResponseEntity<?>  adotar (@PathVariable("id_animal") Long id_animal ) throws MessagingException {
 		Animal animal = new Animal();
 		animal.setId(id_animal);
-		Optional<Animal> animalAdotado = service.obterPorId(id_animal);
+		 
 		
+		Optional<Animal> animalAdotado = service.obterPorId(id_animal);
+	 
+		animalAdotado.get().getUsuario();
 		if (animalAdotado.isPresent()) {
 			service.adotar(id_animal);
+			try {
+				userService.notificarAdocao(animalAdotado.get());
+			} catch (NoSuchAlgorithmException e) { 
+				e.printStackTrace();
+			}
 			return new ResponseEntity<Usuario>(HttpStatus.OK);	
 		}else {
 			return new ResponseEntity<String>("Animal não encontrado.",HttpStatus.BAD_REQUEST);
@@ -197,5 +217,19 @@ public class AnimalResource {
 		 }
 	}
 	 
-	 
+	@GetMapping("/buscarAnimal/{id_usuario}")
+	public ResponseEntity<?> buscar( @PathVariable( "id_usuario") Long idUsuario) {
+
+		 Animal aniFiltro = new Animal();
+
+		 Optional<Usuario> user = userService.obterPorId(idUsuario);
+
+		 if(!user.isPresent())
+			 return ResponseEntity.badRequest().body("Não foi possivel realizar a consulta. usuário não encontrado.");
+		 else {
+			 
+				Optional<Animal> animal = service.buscarPorId(aniFiltro);
+				 return ResponseEntity.ok(animal.get());
+		 }
+	}
 }

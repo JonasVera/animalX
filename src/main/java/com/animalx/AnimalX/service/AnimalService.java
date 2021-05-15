@@ -77,6 +77,13 @@ public class AnimalService {
 	}
 	
 	@Transactional 
+	public Page<Animal> listAnimaisUsuario (Pageable paginacao,Usuario usuario){
+		return repository.findByAnimalUsuario(paginacao,usuario);
+		
+	}
+	
+	
+	@Transactional 
 	public Page<Animal> listAnimaisAdotado (Pageable paginacao){
 		return repository.findByAnimalAdotado(paginacao);
 		

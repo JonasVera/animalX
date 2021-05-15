@@ -3,9 +3,15 @@ package com.animalx.AnimalX.service;
 import java.math.BigInteger;
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
+import java.text.ParseException;
 import java.text.SimpleDateFormat;
+import java.time.ZoneId;
+import java.time.format.DateTimeFormatter;
+import java.time.format.FormatStyle;
+import java.time.temporal.TemporalField;
 import java.util.Date;
 import java.util.List;
+import java.util.Locale;
 import java.util.Objects;
 import java.util.Optional; 
 import java.util.stream.Collectors; 
@@ -53,8 +59,7 @@ public class UsuarioService {
 		}  
 		log.info(com.animalx.AnimalX.constants.Classes.USUARIO +" "+ LogMessage.SALVO_COM_SUCESSO.toString());
 		BCryptPasswordEncoder encoderPassword = new BCryptPasswordEncoder();
-		usuario.setSenha(encoderPassword.encode(usuario.getSenha()));
-		
+		usuario.setSenha(encoderPassword.encode(usuario.getSenha())); 
 		return	repository.save(usuario);
 	  
 	}
@@ -96,6 +101,7 @@ public class UsuarioService {
 	
 	public void recuperarSenha(Usuario usuario) {
 		
+		
 		Objects.requireNonNull(usuario.getId());
 		if (usuario.getId() == null) {
 			log.error(com.animalx.AnimalX.constants.Classes.USUARIO +" "+LogMessage.FALHA_AO_FINALIZAR_OPERACAO.toString());
@@ -103,10 +109,16 @@ public class UsuarioService {
 		} 
 		
 		Usuario usuarioCadastrado = repository.findByEmail(usuario.getEmail());
+		
 		usuarioCadastrado.setSenha(usuario.getSenha());
+		
 		BCryptPasswordEncoder encoderPassword = new BCryptPasswordEncoder();
-		usuario.setSenha(encoderPassword.encode(usuario.getSenha()));
+		
+		usuarioCadastrado.setSenha(encoderPassword.encode(usuario.getSenha()));
+	 
 		log.info(com.animalx.AnimalX.constants.Classes.USUARIO +" "+LogMessage.OPERACAO_REALIZADA_COM_SUCESSO.toString());
+		System.out.println("\n SENHA 2 "+usuarioCadastrado.getSenha());
+		
 		repository.save(usuarioCadastrado);		
 	}
 	
@@ -151,6 +163,32 @@ public class UsuarioService {
 		}
 
 	}
+	
+	public void notificarAdocao(Animal animal) throws NoSuchAlgorithmException {
+		Usuario usuarioEmail = repository.findByEmail(animal.getUsuario().getEmail());
+		
+		if (usuarioEmail == null) {
+			log.info("E-MAIL: "+com.animalx.AnimalX.constants.Classes.USUARIO +" "+LogMessage.INFORMACAO_INVALIDA.toString());
+			throw new RegraNegocioException("E-mail inválido !");
+		} 
+		  
+		try {
+			DateTimeFormatter formatter =
+				    DateTimeFormatter.ofLocalizedDateTime( FormatStyle.SHORT ) 
+				                     .withZone(ZoneId.of("America/Sao_Paulo"));
+			String dataADocao = formatter.format( animal.getData_atualizacao() );
+				 
+				String textoAdocao = "Animal-X = " +animal.getApelido() +"<br/>"+" Data de adoção: "+dataADocao.split(" ")[0];
+				serviceMail.sendEmailNotificacaoAdocao(animal.getUsuario().getEmail(),
+						  textoAdocao,
+				 	 "Notificação de adoção" );
+		  
+			
+		} catch (MessagingException e) {
+			log.error("E-MAIL: "+com.animalx.AnimalX.constants.Classes.USUARIO +" "+LogMessage.FALHA_AO_FINALIZAR_OPERACAO.toString());
+			e.printStackTrace();
+		} 
+	}
 	 	
 	public void triggerMail(Usuario usuario ) throws MessagingException {
 
@@ -168,6 +206,7 @@ public class UsuarioService {
 	}
 	public List<Usuario> listUsuarios (){
 		log.info(com.animalx.AnimalX.constants.Classes.USUARIO +" "+LogMessage.OPERACAO_REALIZADA_COM_SUCESSO.toString());
+		
 		return repository.findAll()
 				.stream()
 				.map(this::toUsuarioModel)
@@ -185,7 +224,7 @@ public class UsuarioService {
 		return relatorio;
 	}
 	public Optional<Usuario> obterPorId(Long id) { 
-		if (id != null && id.toString() != "") {
+		if (id != null) {
 			return repository.findById(id);
 		}else
 			log.info(com.animalx.AnimalX.constants.Classes.USUARIO +" "+LogMessage.INFORMACAO_INVALIDA.toString());

@@ -37,6 +37,16 @@ public class Usuario {
 	@Column(name = "email")
 	private String  email;
 
+	@Column(name = "telefone")
+	private String  telefone;
+	
+	
+	@Column(name = "cidade")
+	private String  cidade;
+	
+	@Column(name = "estado")
+	private String  estado;
+	 
 	@Column(name = "tipo_usuario")
 	private String  tipo_usuario;
 	 

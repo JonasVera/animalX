@@ -11,7 +11,7 @@ import lombok.NoArgsConstructor;
 @Builder
 @AllArgsConstructor
 @NoArgsConstructor
-public class UsuarioStartDTO {
+public class UsuarioDTO {
 	
 	private Long id;
 	@NotNull
@@ -20,6 +20,13 @@ public class UsuarioStartDTO {
 	private String email;
 	@NotNull
 	private String senha;
+	
+	private String cidade;
+	
+	private String estado;
+	
+	private String telefone;
+	
 	
 	
 }

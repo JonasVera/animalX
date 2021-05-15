@@ -65,16 +65,9 @@ public class Animal {
 
 	@Column(name = "sexo")
 	private String sexo;
-
-	@Column(name = "estado")
-	private String estado;
-	
-	@Column(name = "cidade")
-	private String cidade;
  
 	@ManyToOne
 	@JoinColumn(name = "id_usuario")
-	@JsonIgnore
 	private Usuario usuario;
 
 	 
