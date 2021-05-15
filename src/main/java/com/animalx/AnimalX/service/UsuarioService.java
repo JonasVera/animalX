@@ -143,7 +143,7 @@ public class UsuarioService {
 		 
 		try {
 			serviceMail.sendEmailWithAttachment(user.getEmail(),
-					url_server+"/api/usuario/RecuperarSenha/"+textoId+"/"+usuarioEmail.getEmail(),
+					url_server+"/api/usuario/recuperarSenha/"+textoId+"/"+usuarioEmail.getEmail(),
 			 	 "Recuperação de senha" );
 		} catch (MessagingException e) {
 			log.error("E-MAIL: "+com.animalx.AnimalX.constants.Classes.USUARIO +" "+LogMessage.FALHA_AO_FINALIZAR_OPERACAO.toString());
