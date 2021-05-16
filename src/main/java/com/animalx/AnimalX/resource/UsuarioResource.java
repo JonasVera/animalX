@@ -49,7 +49,7 @@ public class UsuarioResource {
 				.tipo_usuario(ProfileEnum.ROLE_CUSTUMER.toString())
 				.cidade(dto.getCidade())
 				.estado(dto.getEstado())
-				.telefone(dto.getTelefone())
+				.whatsapp(dto.getWhatsapp())
 				.build();
 		try {
 			Usuario usuarioSalvo = service.salvarUsuario(usuario);
@@ -93,7 +93,7 @@ public class UsuarioResource {
 										.tipo_usuario(ProfileEnum.ROLE_CUSTUMER.toString())
 										.cidade(dto.getCidade())
 										.estado(dto.getEstado())
-										.telefone(dto.getTelefone())
+										.whatsapp(dto.getWhatsapp())
 										.build(); 
 							  entity = usuario;
 							  

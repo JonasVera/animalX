@@ -25,7 +25,7 @@ public class UsuarioDTO {
 	
 	private String estado;
 	
-	private String telefone;
+	private String whatsapp;
 	
 	
 	

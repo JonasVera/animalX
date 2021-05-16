@@ -37,9 +37,8 @@ public class Usuario {
 	@Column(name = "email")
 	private String  email;
 
-	@Column(name = "telefone")
-	private String  telefone;
-	
+	@Column(name = "whatsapp")
+	private String  whatsapp; 
 	
 	@Column(name = "cidade")
 	private String  cidade;

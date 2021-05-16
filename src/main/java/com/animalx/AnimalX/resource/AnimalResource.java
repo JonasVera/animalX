@@ -54,6 +54,7 @@ public class AnimalResource {
 				.peso(BigDecimal.valueOf(Double.parseDouble(dto.getPeso())))
 				.alura(BigDecimal.valueOf(Double.parseDouble(dto.getAltura())))
 				.categoria(dto.getCategoria())
+				.tamanho(dto.getTamanho())
 				.situacao(dto.getSituacao()) 
 				.data_atualizacao(Instant.now()) 
 				.data_cadastro((Instant.now()))
@@ -90,6 +91,7 @@ public class AnimalResource {
 								.idade(Integer.parseInt(dto.getIdade()))
 								.peso(BigDecimal.valueOf(Double.parseDouble(dto.getPeso())))
 								.categoria(dto.getCategoria())
+								.tamanho(dto.getTamanho())
 								.situacao(dto.getSituacao())  
 								.data_atualizacao(Instant.now()) 
 								.usuario(usuario)
@@ -123,10 +125,8 @@ public class AnimalResource {
 			return service.listAnimaisUsuario(paginacao,usuario); 
 		}else {
 			  return null;
-		}
-		  
-	}
-	
+		} 
+	} 
 	
 	@GetMapping("animais/adotados")  
 	public Page<Animal> listAnimaisAdotados(@PageableDefault(sort = "id", direction = Direction.ASC) Pageable paginacao ) { 

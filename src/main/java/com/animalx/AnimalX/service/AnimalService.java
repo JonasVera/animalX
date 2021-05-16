@@ -2,11 +2,17 @@ package com.animalx.AnimalX.service;
 
 import java.util.List;
 import java.util.Optional;
+import java.util.stream.Collectors;
+
 import javax.transaction.Transactional;
+
+import com.animalx.AnimalX.constants.LogMessage;
 import com.animalx.AnimalX.entity.Animal;
 import com.animalx.AnimalX.entity.Usuario;
 import com.animalx.AnimalX.exeptions.RegraNegocioException;
 import com.animalx.AnimalX.repository.AnimalRepository;
+
+import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Example;
 import org.springframework.data.domain.Page;
@@ -23,6 +29,9 @@ public class AnimalService {
 	@Autowired 
 	private UsuarioService userService;
 	
+ 	@Autowired
+ 	private ModelMapper modelMapper;
+ 	
 	@Transactional 
 	public Animal cadastrarAnimalComUsuario(Animal animal) {
 		
@@ -72,13 +81,12 @@ public class AnimalService {
 	}
 	@Transactional 
 	public Page<Animal> listAnimais (Pageable paginacao){
-		return repository.findByAnimalNaoAdotado(paginacao);
-		
+		return repository.findByAnimalNaoAdotado(paginacao).map(this::toAnimalModel);
 	}
 	
 	@Transactional 
 	public Page<Animal> listAnimaisUsuario (Pageable paginacao,Usuario usuario){
-		return repository.findByAnimalUsuario(paginacao,usuario);
+		return repository.findByAnimalUsuario(paginacao,usuario).map(this::toAnimalModel);
 		
 	}
 	
@@ -98,6 +106,23 @@ public class AnimalService {
 		validaAnimal(animal);
 		repository.delete(animal);
 	}
+	
+	private Animal toAnimalModel(Animal animal) {
+		animal.getUsuario().setSenha(null);  
+		animal.getUsuario().setData_atualizacao(null);
+		animal.getUsuario().setData_cadastro(null);
+		animal.getUsuario().setTipo_usuario(null);
+		return modelMapper.map(animal,Animal.class);
+		
+	}
+	
+	public List<Animal> listTAll (){ 
+		return repository.findAll()
+				.stream()
+				.map(this::toAnimalModel)
+				.collect(Collectors.toList());
+	}
+
 	
 	public void validaAnimal(Animal animal) {
 		 

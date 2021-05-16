@@ -12,7 +12,7 @@ import javax.persistence.JoinColumn;
 import javax.persistence.ManyToOne;
 import javax.persistence.OneToMany;
 import javax.persistence.Table;
-import com.fasterxml.jackson.annotation.JsonIgnore;
+
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
@@ -41,7 +41,7 @@ public class Animal {
 
 	@Column(name = "raca")
 	private String  raca;
-
+	 
 	@Column(name = "descricao")
 	private String  descricao;
 
@@ -50,6 +50,9 @@ public class Animal {
 	
 	@Column(name = "altura")
 	private BigDecimal alura;
+	
+	@Column(name = "tamanho")
+	private String tamanho;
 
 	@Column(name = "categoria")
 	private String categoria;
@@ -67,13 +70,13 @@ public class Animal {
 	private String sexo;
  
 	@ManyToOne
-	@JoinColumn(name = "id_usuario")
-	private Usuario usuario;
-
+	@JoinColumn(name = "id_usuario") 
+	private Usuario usuario; 
 	 
 	@Column(name = "data_cadastro")
 	private Instant data_cadastro; 
- 
+
+	
 	@Column(name = "data_atualizacao")
 	private  Instant data_atualizacao;
 	
