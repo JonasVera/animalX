@@ -1,6 +1,5 @@
 package com.animalx.AnimalX.dto;
-
-
+  
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
@@ -29,7 +28,6 @@ public class AnimalDTO {
 	private String situacao;
 	private Long usuario;
 	private String sexo;
-
-	
+ 
  
 }
