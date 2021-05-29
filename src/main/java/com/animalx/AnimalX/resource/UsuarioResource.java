@@ -26,9 +26,10 @@ import com.animalx.AnimalX.exeptions.RegraNegocioException;
 import com.animalx.AnimalX.service.S3StorageService;
 import com.animalx.AnimalX.service.UsuarioService;
 
-@RestController
-@RequestMapping("/api/usuario/")
-@CrossOrigin(origins = "*")
+
+@RestController 
+@RequestMapping("api/usuario/") 
+@CrossOrigin(origins = "*", allowedHeaders = "*") 
 public class UsuarioResource {
 
 	@Autowired
@@ -37,7 +38,7 @@ public class UsuarioResource {
 	 @Autowired
 	 private S3StorageService serviceS3;
 	 
-	@PostMapping("/salvar") 
+	@PostMapping("salvar") 
 	public ResponseEntity<?> salvarUsuario ( @RequestBody UsuarioDTO dto) {
 
 		Usuario usuario = Usuario.builder()
@@ -169,7 +170,7 @@ public class UsuarioResource {
 		user.setSenha(dto.getSenha());
 		
 		if(encript.equals(id)) { 
-			System.out.println("SENHA DTO "+user.getSenha()); 
+			 
 			service.recuperarSenha(user); 
 		}else {
 			return  new ResponseEntity<String>("Usuario não encontrado.",HttpStatus.BAD_REQUEST);

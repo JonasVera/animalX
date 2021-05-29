@@ -16,7 +16,7 @@ import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
  
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
-
+import org.springframework.web.cors.CorsConfiguration;
 
 import com.animalx.AnimalX.exeptions.JwtAuthenticationEntryPoint;
 import com.animalx.AnimalX.exeptions.JwtAutheticationTokenFilter;
@@ -58,7 +58,8 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter{
 		
 	@Override
 	protected void configure(HttpSecurity httpSecurity) throws Exception{
-		httpSecurity.csrf().disable()
+		httpSecurity.cors().configurationSource(request-> new CorsConfiguration().applyPermitDefaultValues())
+		.and().csrf().disable()
 		.exceptionHandling().authenticationEntryPoint(jwtAuthEntryPoint).and()
 		.sessionManagement().sessionCreationPolicy(SessionCreationPolicy.STATELESS).and()
 		.authorizeRequests()
@@ -71,6 +72,7 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter{
 				"/**/*.js"
 				).permitAll()
 				.antMatchers("/api/auth/**").permitAll() 
+				.antMatchers(HttpMethod.POST,"/api/usuario/salvar").permitAll()
 				.antMatchers("/api/usuario/salvar").permitAll()
 				.antMatchers("/api/animal/**").permitAll()
 				.antMatchers(HttpMethod.GET,"/api/animal/animaisAdocao").permitAll()
