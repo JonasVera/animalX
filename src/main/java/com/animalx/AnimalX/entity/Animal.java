@@ -59,6 +59,9 @@ public class Animal {
 
 	@Column(name = "idade")
 	private int idade;
+	
+	@Column(name = "unidadetempo")
+	private String unidadetempo;
 
 	@Column(name = "situacao")
 	private String situacao;

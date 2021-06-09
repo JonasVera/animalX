@@ -60,6 +60,34 @@ public class UsuarioResource {
 			return ResponseEntity.badRequest().body(e.getMessage());
 		}
 	}
+	
+	@PostMapping("salvarComFotoPerfil") 
+	public ResponseEntity<?> salvarUsuarioComFoto ( @RequestBody UsuarioDTO dto,@RequestParam MultipartFile file) {
+
+		Usuario usuario = Usuario.builder()
+				.nome(dto.getNome())
+				.email(dto.getEmail())
+				.senha(dto.getSenha())
+				.data_cadastro((Instant.now()))
+				.data_atualizacao((Instant.now())) 
+				.tipo_usuario(ProfileEnum.ROLE_CUSTUMER.toString())
+				.cidade(dto.getCidade())
+				.estado(dto.getEstado())
+				.whatsapp(dto.getWhatsapp())
+				
+				.build();
+		try {
+		
+			 
+				usuario.setImg_login(serviceS3.uploadFile(file));
+			 
+			Usuario usuarioSalvo = service.salvarUsuario(usuario);
+			usuarioSalvo.setSenha("");	
+			return new ResponseEntity<Usuario>(usuarioSalvo, HttpStatus.CREATED);
+		}catch (RegraNegocioException e) {
+			return ResponseEntity.badRequest().body(e.getMessage());
+		}
+	}
 	@GetMapping("usuarios") 
 	@PreAuthorize("hasAnyRole('ADMIN')")
 	public ResponseEntity<?> listUsuarios() {

@@ -24,6 +24,7 @@ public class AnimalDTO {
 	private String altura;
 	private String tamanho;
 	private String idade;
+	private String unidadeTempo;
 	private String categoria;
 	private String situacao;
 	private Long usuario;

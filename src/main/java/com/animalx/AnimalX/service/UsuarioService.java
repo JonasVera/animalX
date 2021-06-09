@@ -15,7 +15,9 @@ import java.util.Locale;
 import java.util.Objects;
 import java.util.Optional; 
 import java.util.stream.Collectors; 
-import javax.mail.MessagingException; 
+import javax.mail.MessagingException;
+import javax.transaction.Transactional;
+
 import com.animalx.AnimalX.constants.LogMessage;
 import com.animalx.AnimalX.entity.Animal;
 import com.animalx.AnimalX.entity.RelatorioDados;
@@ -51,6 +53,10 @@ public class UsuarioService {
  	@Value("${url.server}")
  	private String url_server;
  	
+ 	@Value("${url.front}")
+ 	private String url_front;
+ 	
+ 	@Transactional 
 	public Usuario salvarUsuario(Usuario usuario) {
 		validarEmail(usuario.getEmail());
 		if (usuario.getEmail().equals("") || usuario.getEmail().contains("@") == false) {
@@ -63,6 +69,7 @@ public class UsuarioService {
 		return	repository.save(usuario);
 	  
 	}
+	@Transactional 
 	public void uploadFotoPerfil(Usuario user){
 		Objects.requireNonNull(user.getId());
 		
@@ -73,6 +80,7 @@ public class UsuarioService {
 		log.info(com.animalx.AnimalX.constants.Classes.FOTO +" "+LogMessage.SALVO_COM_SUCESSO.toString());
 		repository.save(userUp);
 	}
+	@Transactional 
 	public Usuario updateUsuario(Usuario usuario) {
 		
 		Objects.requireNonNull(usuario.getId());
@@ -87,7 +95,7 @@ public class UsuarioService {
 		return	repository.save(usuario);
 	  
 	}
-	
+	@Transactional 
 	public void excluirPerfil(Usuario usuario) {
 		Objects.requireNonNull(usuario.getId());
 		
@@ -98,7 +106,7 @@ public class UsuarioService {
 		 	log.info(com.animalx.AnimalX.constants.Classes.USUARIO +" "+LogMessage.EXCLUIDO_COM_SUCESSO.toString());
 			repository.delete(usuario); 
 	}
-	
+	@Transactional
 	public void recuperarSenha(Usuario usuario) {
 		
 		
@@ -121,7 +129,7 @@ public class UsuarioService {
 		
 		repository.save(usuarioCadastrado);		
 	}
-	
+	@Transactional 
 	public  String encriptar (String texto) {
 		 
 		try {
@@ -142,7 +150,7 @@ public class UsuarioService {
 		log.info("ID CRIADO: "+com.animalx.AnimalX.constants.Classes.USUARIO +" "+LogMessage.OPERACAO_REALIZADA_COM_SUCESSO.toString());
 		return texto;
 	}
-	
+	@Transactional 
 	public void enviarEmailRecupercaoSenha(Usuario user) throws NoSuchAlgorithmException {
 		Usuario usuarioEmail = repository.findByEmail(user.getEmail());
 		
@@ -155,7 +163,7 @@ public class UsuarioService {
 		 
 		try {
 			serviceMail.sendEmailWithAttachment(user.getEmail(),
-					url_server+"/api/usuario/recuperarSenha/"+textoId+"/"+usuarioEmail.getEmail(),
+					url_front+"?id="+textoId+"&email="+usuarioEmail.getEmail(),
 			 	 "Recuperação de senha" );
 		} catch (MessagingException e) {
 			log.error("E-MAIL: "+com.animalx.AnimalX.constants.Classes.USUARIO +" "+LogMessage.FALHA_AO_FINALIZAR_OPERACAO.toString());
@@ -163,7 +171,7 @@ public class UsuarioService {
 		}
 
 	}
-	
+	 
 	public void notificarAdocao(Animal animal) throws NoSuchAlgorithmException {
 		Usuario usuarioEmail = repository.findByEmail(animal.getUsuario().getEmail());
 		
@@ -204,6 +212,7 @@ public class UsuarioService {
 		return modelMapper.map(usuario,Usuario.class);
 		
 	}
+	@Transactional 
 	public List<Usuario> listUsuarios (){
 		log.info(com.animalx.AnimalX.constants.Classes.USUARIO +" "+LogMessage.OPERACAO_REALIZADA_COM_SUCESSO.toString());
 		
@@ -213,7 +222,7 @@ public class UsuarioService {
 				.collect(Collectors.toList());
 	}
 
-	
+	@Transactional 
 	public RelatorioDados getRelatorio() {
 		
 		 RelatorioDados relatorio = new RelatorioDados(); 
@@ -241,6 +250,7 @@ public class UsuarioService {
 		}
 		return existe; 
 	} 
+	@Transactional 
 	public Usuario findByEmail(String email) {
 		Objects.requireNonNull(email); 
 		log.info(com.animalx.AnimalX.constants.Classes.USUARIO +" "+LogMessage.OPERACAO_REALIZADA_COM_SUCESSO.toString());
