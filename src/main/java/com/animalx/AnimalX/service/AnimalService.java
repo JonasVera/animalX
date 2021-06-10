@@ -107,11 +107,7 @@ public class AnimalService {
 		repository.delete(animal);
 	}
 	
-	private Animal toAnimalModel(Animal animal) {
-		animal.getUsuario().setSenha(null);  
-		animal.getUsuario().setData_atualizacao(null);
-		animal.getUsuario().setData_cadastro(null);
-		animal.getUsuario().setTipo_usuario(null);
+	private Animal toAnimalModel(Animal animal) { 
 		return modelMapper.map(animal,Animal.class);
 		
 	}

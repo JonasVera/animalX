@@ -5,6 +5,7 @@ import java.time.Instant;
 import java.util.List;
 import javax.persistence.Column;
 import javax.persistence.Entity;
+import javax.persistence.FetchType;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
@@ -72,7 +73,7 @@ public class Animal {
 	@Column(name = "sexo")
 	private String sexo;
  
-	@ManyToOne
+	@ManyToOne(fetch = FetchType.EAGER)
 	@JoinColumn(name = "id_usuario") 
 	private Usuario usuario; 
 	 

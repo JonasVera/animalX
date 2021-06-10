@@ -1,9 +1,12 @@
 package com.animalx.AnimalX.entity;
 
 import java.time.Instant;
- 
+import java.util.List;
 
 import javax.persistence.*;
+
+import com.fasterxml.jackson.annotation.JsonIgnore;
+
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
@@ -16,8 +19,7 @@ import lombok.ToString;
 @Entity
 @Table(name = "usuario", schema = "api_animalx")
 @Data
-@Builder
-@EqualsAndHashCode
+@Builder 
 @ToString
 @NoArgsConstructor
 @AllArgsConstructor
@@ -57,5 +59,9 @@ public class Usuario {
 	
 	@Column(name = "senha")
 	private String senha;
+	
+	@OneToMany(mappedBy = "usuario", fetch = FetchType.LAZY)
+	@JsonIgnore
+	private List<Animal> animal;
 	
 }

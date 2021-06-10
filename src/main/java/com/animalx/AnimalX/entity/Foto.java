@@ -40,4 +40,6 @@ public class Foto {
  
 	@Column(name = "data_atualizacao")
 	private Instant data_atualizacao;
+	
+	 
 }
