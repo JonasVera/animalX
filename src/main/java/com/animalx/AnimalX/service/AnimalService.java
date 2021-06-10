@@ -107,7 +107,8 @@ public class AnimalService {
 		repository.delete(animal);
 	}
 	
-	private Animal toAnimalModel(Animal animal) { 
+	private Animal toAnimalModel(Animal animal) {
+		 
 		return modelMapper.map(animal,Animal.class);
 		
 	}
